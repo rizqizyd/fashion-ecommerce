@@ -4,13 +4,9 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-} from "firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,18 +21,27 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
-provider.setCustomParameters({
+googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth) => {
+export const createUserDocumentFromAuth = async (
+  userAuth,
+  additionalInformation = {}
+) => {
+  // protect the code
+  if (!userAuth) return;
+
   const userDocRef = doc(db, "users", userAuth.uid);
 
   console.log(userDocRef);
@@ -44,11 +49,10 @@ export const createUserDocumentFromAuth = async (userAuth) => {
   const userSnapshot = await getDoc(userDocRef);
   console.log(userSnapshot);
   console.log(userSnapshot.exists());
-  
-  // if user data exist
-  // create / set the document with the data from userAuth in my collection
+
+  // if user data exist, create / set the document with the data from userAuth in my collection
   if (!userSnapshot.exists()) {
-    const {displayName, email} = userAuth;
+    const { displayName, email } = userAuth;
     const createdAt = new Date();
 
     try {
@@ -56,13 +60,20 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         displayName,
         email,
         createdAt,
+        ...additionalInformation,
       });
     } catch (error) {
-      console.log('error creating the user', error.message);
+      console.log("error creating the user", error.message);
     }
   }
 
-  // if user data does not exist
-  // return userDocRef
+  // if user data does not exist, return userDocRef
   return userDocRef;
-}
+};
+
+// create user by email and password
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
