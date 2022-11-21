@@ -21,7 +21,13 @@ const SignUpForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { displayName, email, password, confirmPassword } = formFields;
 
+  // if you're hooked into the context will cause react to rerun your function.
+  // const val = useContext(UserContext);
+  // You can kind of see use context as just a glorified hook into another component that will re render
+  // its subsequent hooked components whenever this component updates in some way.
+
   // console.log(formFields);
+  // console.log("hit");
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);

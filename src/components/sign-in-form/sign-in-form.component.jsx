@@ -3,9 +3,10 @@ import { useState } from "react";
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 
+// import { UserContext } from "../../contexts/user.context";
+
 import {
   signInWithGooglePopup,
-  createUserDocumentFromAuth,
   signInAuthUserWithEmailAndPassword,
 } from "../../utils/firebase/firebase.utils";
 
@@ -22,25 +23,25 @@ const SignInForm = () => {
 
   // console.log(formFields);
 
+  // useContext passing data in the UserContext
+  // const { setCurrentUser } = useContext(UserContext);
+  // because we want to centralizing authentication from one listener (onAuthStateChangedListener), we don't need this setCurrentUser anymore
+  // So one nice advantage we get is that, we have now stopped hooking into our user context from both the sign up form and the sign in form.
+
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
 
   const signInWithGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    // console.log(response);
-    await createUserDocumentFromAuth(user);
+    await signInWithGooglePopup();
   };
 
   const handleSubmit = async event => {
     event.preventDefault();
 
     try {
-      const response = await signInAuthUserWithEmailAndPassword(
-        email,
-        password
-      );
-      console.log(response);
+      await signInAuthUserWithEmailAndPassword(email, password);
+      // setCurrentUser(user);
       resetFormFields();
     } catch (error) {
       switch (error.code) {

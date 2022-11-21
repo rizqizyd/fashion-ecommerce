@@ -6,6 +6,8 @@ import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
@@ -20,7 +22,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
+// const firebaseApp = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -79,10 +82,24 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
   return await createUserWithEmailAndPassword(auth, email, password);
 };
 
-
 // sign in with email and password
 export const signInAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
 
   return await signInWithEmailAndPassword(auth, email, password);
 };
+
+export const signOutUser = async () => await signOut(auth);
+
+// So when a user signs in, that's considered an auth changed, because a user has authenticated when a user signs out, that's another change.
+// So both times our callback is going to get invoked whenever a user authenticates in and whenever an authenticates out.
+export const onAuthStateChangedListener = callback =>
+  onAuthStateChanged(auth, callback);
+
+/**
+ * {
+ * next: callback,
+ * error: errorCallback,
+ * complete: completeCallback
+ * }
+ */
