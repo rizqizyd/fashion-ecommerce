@@ -1,4 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useEffect, useReducer } from "react";
+
+import { createAction } from "../utils/reducer/reducer.utils";
 
 import {
   createUserDocumentFromAuth,
@@ -11,9 +13,40 @@ export const UserContext = createContext({
   setCurrentUser: () => null,
 });
 
+// action reducer
+export const USER_ACTION_TYPES = {
+  SET_CURRENT_USER: "SET_CURRENT_USER",
+};
+
+// useReducer function | We're not using useState to store that value anymore. We're now using a reducer.
+const userReducer = (state, action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case USER_ACTION_TYPES.SET_CURRENT_USER:
+      return {
+        ...state,
+        currentUser: payload,
+      };
+    default:
+      throw new Error(`Unhandled type ${type} in userReducer`);
+  }
+};
+
+// initial state for userReducer
+const INITIAL_STATE = {
+  currentUser: null,
+};
+
 // centralize and clean up our architecture of our react application.
 export const UserProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  // dispatching action reducer
+  const [{ currentUser }, dispatch] = useReducer(userReducer, INITIAL_STATE);
+
+  const setCurrentUser = user => {
+    dispatch(createAction(USER_ACTION_TYPES.SET_CURRENT_USER, user));
+  };
+
   const value = { currentUser, setCurrentUser };
 
   // onlyrun this function once when the component mounts
