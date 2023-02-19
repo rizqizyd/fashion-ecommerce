@@ -18,6 +18,11 @@ export const USER_ACTION_TYPES = {
   SET_CURRENT_USER: "SET_CURRENT_USER",
 };
 
+// initial state for userReducer
+const INITIAL_STATE = {
+  currentUser: null,
+};
+
 // useReducer function | We're not using useState to store that value anymore. We're now using a reducer.
 const userReducer = (state, action) => {
   const { type, payload } = action;
@@ -31,11 +36,6 @@ const userReducer = (state, action) => {
     default:
       throw new Error(`Unhandled type ${type} in userReducer`);
   }
-};
-
-// initial state for userReducer
-const INITIAL_STATE = {
-  currentUser: null,
 };
 
 // centralize and clean up our architecture of our react application.
