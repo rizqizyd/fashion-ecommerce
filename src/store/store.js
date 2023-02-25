@@ -9,15 +9,15 @@ const loggerMiddleware = store => next => action => {
   if (!action.type) {
     return next(action);
   }
-  // console.log("type: ", action.type);
-  // console.log("payload: ", action.payload);
+  console.log("type: ", action.type);
+  console.log("payload: ", action.payload);
 
   // Get state will give us back the value of the state right now.
-  // console.log("currentState: ", store.getState());
+  console.log("currentState: ", store.getState());
 
   next(action);
 
-  // console.log("next state: ", store.getState());
+  console.log("next state: ", store.getState());
 };
 
 const middleWares = [loggerMiddleware];
