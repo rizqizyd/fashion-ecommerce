@@ -4,20 +4,22 @@ import { persistStore, persistReducer } from "redux-persist";
 // So by default in any web browser, this will just use local storage.
 import storage from "redux-persist/lib/storage";
 import logger from "redux-logger";
+import thunk from "redux-thunk";
 
 import { rootReducer } from "./root-reducer";
 
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["user"], // for which reducer you don't want to persist
+  whitelist: ["cart"], // for which reducer you don't want to persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const middleWares = [process.env.NODE_ENV !== "production" && logger].filter(
-  Boolean
-);
+const middleWares = [
+  process.env.NODE_ENV !== "production" && logger,
+  thunk,
+].filter(Boolean);
 
 // If these fail, then we'll use regular 'compose' just as we had been for otherwise run the actual one from 'Redux DevTools'
 const composedEnhancer =
