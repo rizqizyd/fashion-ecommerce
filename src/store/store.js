@@ -4,7 +4,11 @@ import { persistStore, persistReducer } from "redux-persist";
 // So by default in any web browser, this will just use local storage.
 import storage from "redux-persist/lib/storage";
 import logger from "redux-logger";
-import thunk from "redux-thunk";
+// import thunk from "redux-thunk";
+// So again saga's replace thunks, you mainly want one asynchronous side effect library.
+import createSagaMiddleware from "redux-saga";
+
+import { rootSaga } from "./root-saga";
 
 import { rootReducer } from "./root-reducer";
 
@@ -14,11 +18,13 @@ const persistConfig = {
   whitelist: ["cart"], // for which reducer you don't want to persist
 };
 
+const sagaMiddleware = createSagaMiddleware();
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const middleWares = [
   process.env.NODE_ENV !== "production" && logger,
-  thunk,
+  sagaMiddleware,
 ].filter(Boolean);
 
 // If these fail, then we'll use regular 'compose' just as we had been for otherwise run the actual one from 'Redux DevTools'
@@ -39,6 +45,8 @@ export const store = createStore(
   undefined,
   composedEnhancers
 );
+
+sagaMiddleware.run(rootSaga);
 
 // using these new modified persisted values that we have in Redux that we can now persist the store.
 export const persistor = persistStore(store);
