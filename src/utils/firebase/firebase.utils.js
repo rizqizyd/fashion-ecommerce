@@ -81,11 +81,11 @@ export const createUserDocumentFromAuth = async (
 
   const userDocRef = doc(db, "users", userAuth.uid);
 
-  console.log(userDocRef);
+  // console.log(userDocRef);
 
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot);
-  console.log(userSnapshot.exists());
+  // console.log(userSnapshot);
+  // console.log(userSnapshot.exists());
 
   // if user data exist, create / set the document with the data from userAuth in my collection
   if (!userSnapshot.exists()) {
@@ -105,7 +105,9 @@ export const createUserDocumentFromAuth = async (
   }
 
   // if user data does not exist, return userDocRef
-  return userDocRef;
+  // return userDocRef;
+
+  return userSnapshot;
 };
 
 // create user by email and password
@@ -136,3 +138,17 @@ export const onAuthStateChangedListener = callback =>
  * complete: completeCallback
  * }
  */
+
+// convert from a observable listener into a promise based function call
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      userAuth => {
+        unsubscribe();
+        resolve(userAuth);
+      },
+      reject
+    );
+  });
+};
