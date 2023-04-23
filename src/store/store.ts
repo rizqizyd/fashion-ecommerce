@@ -1,6 +1,6 @@
-import { compose, createStore, applyMiddleware } from "redux";
+import { compose, createStore, applyMiddleware, Middleware } from "redux";
 // redux-persist allows storing the state of the Redux store in browser storage, such as localStorage, sessionStorage, or IndexedDB.
-import { persistStore, persistReducer } from "redux-persist";
+import { persistStore, persistReducer, PersistConfig } from "redux-persist";
 // So by default in any web browser, this will just use local storage.
 import storage from "redux-persist/lib/storage";
 import logger from "redux-logger";
@@ -12,7 +12,19 @@ import { rootSaga } from "./root-saga";
 
 import { rootReducer } from "./root-reducer";
 
-const persistConfig = {
+export type RootState = ReturnType<typeof rootReducer>;
+
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+  }
+}
+
+type ExtendedPersistConfig = PersistConfig<RootState> & {
+  whitelist: (keyof RootState)[];
+};
+
+const persistConfig: ExtendedPersistConfig = {
   key: "root",
   storage,
   whitelist: ["cart"], // for which reducer you don't want to persist
@@ -25,7 +37,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const middleWares = [
   process.env.NODE_ENV !== "production" && logger,
   sagaMiddleware,
-].filter(Boolean);
+].filter((middleware): middleware is Middleware => Boolean(middleware));
 
 // If these fail, then we'll use regular 'compose' just as we had been for otherwise run the actual one from 'Redux DevTools'
 const composedEnhancer =
