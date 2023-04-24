@@ -10,10 +10,19 @@ import {
   selectCategoriesMap,
 } from "../../store/categories/category.selector";
 
-import "./category.styles.scss";
+import { CategoryContainer, Title } from "./category.styles";
+
+type CategoryRouteParams = {
+  // this is non optional, this must be a string value.
+  category: string;
+};
 
 const Category = () => {
-  const { category } = useParams();
+  // if there are additional parameters, we want to be able to have them accessible.
+  const { category } = useParams<
+    keyof CategoryRouteParams
+  >() as CategoryRouteParams;
+
   const categoriesMap = useSelector(selectCategoriesMap);
   const isLoading = useSelector(selectCategoriesIsLoading);
   const [products, setProducts] = useState(categoriesMap[category]);
@@ -24,16 +33,16 @@ const Category = () => {
 
   return (
     <Fragment>
-      <h2 className="category-title">{category.toUpperCase()}</h2>
+      <Title>{category.toUpperCase()}</Title>
       {isLoading ? (
         <Spinner />
       ) : (
-        <div className="category-container">
+        <CategoryContainer>
           {products &&
             products.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
-        </div>
+        </CategoryContainer>
       )}
     </Fragment>
   );
